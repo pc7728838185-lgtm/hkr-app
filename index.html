@@ -12117,23 +12117,23 @@ async function submitWithdrawRequest(){
     if(!data || !data.success){
       const err = data?.error || 'UNKNOWN';
 
-      if(err === 'INSUFFICIENT_BALANCE'){
-        toast('Wallet balance kam hai');
-      }else if(err === 'MIN_AMOUNT_50'){
-        toast('Minimum withdrawal ₹50 hai');
-      }else if(err === 'LOGIN_REQUIRED'){
-        toast('Pehle login karo');
-      }else if(err === 'UPI_REQUIRED'){
-        toast('UPI ID required');
-      }else if(err === 'NAME_REQUIRED'){
-        toast('Naam required');
-      }else if(err === 'INVALID_AMOUNT'){
-        toast('Valid amount daalo');
-      }else if(err === 'WALLET_NOT_FOUND'){
-        toast('Wallet nahi mila');
-      }else{
-        toast('Withdraw request failed');
-      }
+  if(err === 'INSUFFICIENT_BALANCE'){
+  toast('Insufficient balance');
+}else if(err === 'MIN_AMOUNT_30'){
+  toast('Minimum withdrawal ₹30 hai');
+}else if(err === 'LOGIN_REQUIRED'){
+  toast('Pehle login karo');
+}else if(err === 'UPI_REQUIRED'){
+  toast('UPI ID required');
+}else if(err === 'NAME_REQUIRED'){
+  toast('Naam required');
+}else if(err === 'INVALID_AMOUNT'){
+  toast('Valid amount daalo');
+}else if(err === 'WALLET_NOT_FOUND'){
+  toast('Insufficient balance');
+}else{
+  toast('Withdraw request failed');
+  }
       return;
     }
 
