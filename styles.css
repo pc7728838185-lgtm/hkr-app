@@ -1,0 +1,790 @@
+:root{
+  --bg:#07050b;
+  --bg2:#0d0814;
+  --card:#12101a;
+  --card2:#181321;
+  --line:#292333;
+  --text:#fff;
+  --muted:#aaa4b5;
+  --purple:#9b4dff;
+  --purple2:#6f25ff;
+  --pink:#e83cff;
+  --gold:#ffb52e;
+  --orange:#ff6a00;
+  --danger:#ff4141;
+  --ok:#3bd47b;
+}
+
+*{
+  box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent;
+}
+
+html{
+  scroll-behavior:smooth;
+}
+
+body{
+  margin:0;
+  min-height:100vh;
+  background:
+    radial-gradient(circle at 50% -15%,#3a1257 0,transparent 35%),
+    radial-gradient(circle at 100% 30%,#24103b 0,transparent 28%),
+    #07050b;
+  color:var(--text);
+  font-family:Inter,system-ui,Arial,sans-serif;
+  padding-bottom:78px;
+}
+
+button,
+input,
+select,
+textarea{
+  font:inherit;
+}
+
+button{
+  cursor:pointer;
+}
+
+/* ================= TOP HEADER ================= */
+
+.topbar{
+  position:sticky;
+  top:0;
+  z-index:100;
+  height:68px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:10px 16px;
+  background:rgba(7,5,11,.88);
+  border-bottom:1px solid rgba(155,77,255,.18);
+  backdrop-filter:blur(18px);
+}
+
+.brand{
+  display:flex;
+  align-items:center;
+  gap:9px;
+  font-size:18px;
+  font-weight:950;
+  letter-spacing:.5px;
+  white-space:nowrap;
+}
+
+.brand img{
+  width:42px;
+  height:42px;
+  object-fit:contain;
+  border-radius:12px;
+  filter:drop-shadow(0 0 12px rgba(155,77,255,.5));
+}
+
+.topbar nav{
+  display:flex;
+  align-items:center;
+  gap:7px;
+}
+
+.topbar button,
+.ghost,
+.admin-tabs button{
+  background:#15111d;
+  border:1px solid #30263b;
+  color:#ddd6e8;
+  padding:9px 12px;
+  border-radius:11px;
+  transition:.2s;
+}
+
+.topbar button:hover,
+.ghost:hover,
+.admin-tabs button:hover{
+  border-color:var(--purple);
+  color:#fff;
+  box-shadow:0 0 16px rgba(155,77,255,.18);
+}
+
+/* ================= PAGE ================= */
+
+.page{
+  display:none;
+  width:100%;
+  max-width:1180px;
+  margin:auto;
+  padding:18px 16px 100px;
+}
+
+.page.active{
+  display:block;
+}
+
+/* ================= HERO ================= */
+
+.hero{
+  position:relative;
+  overflow:hidden;
+  min-height:260px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:20px;
+  padding:28px;
+  border:1px solid rgba(172,77,255,.35);
+  border-radius:24px;
+  background:
+    radial-gradient(circle at 85% 50%,rgba(160,55,255,.35),transparent 35%),
+    linear-gradient(135deg,#21102d,#100b18 55%,#0a0810);
+  box-shadow:
+    inset 0 0 50px rgba(130,40,255,.08),
+    0 15px 50px rgba(0,0,0,.35);
+}
+
+.hero:before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:
+    linear-gradient(115deg,transparent 0 48%,rgba(255,255,255,.025) 49%,transparent 50%);
+  pointer-events:none;
+}
+
+.hero h1{
+  position:relative;
+  font-size:clamp(34px,6vw,62px);
+  line-height:.95;
+  margin:7px 0 12px;
+  font-weight:950;
+  letter-spacing:-2px;
+}
+
+.hero h1 span,
+.eyebrow{
+  color:#b866ff;
+  text-shadow:0 0 20px rgba(183,91,255,.4);
+}
+
+.hero p{
+  position:relative;
+  color:var(--muted);
+  max-width:600px;
+  line-height:1.5;
+}
+
+.hero img{
+  position:relative;
+  z-index:1;
+  width:min(280px,36vw);
+  max-height:230px;
+  object-fit:contain;
+  filter:
+    drop-shadow(0 0 25px rgba(160,50,255,.55))
+    drop-shadow(0 0 50px rgba(160,50,255,.18));
+}
+
+.eyebrow{
+  font-size:11px;
+  font-weight:950;
+  letter-spacing:2.5px;
+}
+
+/* ================= SECTION ================= */
+
+.section-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  margin:28px 2px 14px;
+}
+
+.section-head h2{
+  margin:0;
+  font-size:20px;
+  font-weight:900;
+}
+
+.section-head h2:before{
+  content:"";
+  display:inline-block;
+  width:4px;
+  height:19px;
+  margin-right:8px;
+  vertical-align:-3px;
+  border-radius:10px;
+  background:linear-gradient(var(--purple),var(--pink));
+  box-shadow:0 0 12px var(--purple);
+}
+
+/* ================= GRID ================= */
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  gap:14px;
+}
+
+/* ================= CARDS ================= */
+
+.card{
+  position:relative;
+  overflow:hidden;
+  background:
+    linear-gradient(145deg,rgba(27,20,37,.98),rgba(13,11,19,.98));
+  border:1px solid var(--line);
+  border-radius:18px;
+  padding:16px;
+  box-shadow:0 10px 30px rgba(0,0,0,.22);
+  transition:.2s;
+}
+
+.card:hover{
+  transform:translateY(-2px);
+  border-color:rgba(155,77,255,.55);
+  box-shadow:
+    0 12px 35px rgba(0,0,0,.35),
+    0 0 25px rgba(155,77,255,.08);
+}
+
+.tcard{
+  min-height:180px;
+}
+
+.tcard h3{
+  margin:0 0 8px;
+  font-size:18px;
+  font-weight:900;
+}
+
+.meta{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:8px;
+  margin:12px 0;
+}
+
+.meta div{
+  background:#0b0910;
+  border:1px solid #211c29;
+  padding:9px;
+  border-radius:10px;
+}
+
+/* ================= TEXT ================= */
+
+.muted{
+  color:var(--muted);
+  font-size:13px;
+}
+
+.price{
+  color:var(--gold);
+  font-weight:950;
+  text-shadow:0 0 12px rgba(255,181,46,.18);
+}
+
+.badge{
+  display:inline-block;
+  padding:5px 9px;
+  border-radius:999px;
+  background:rgba(155,77,255,.12);
+  border:1px solid rgba(155,77,255,.25);
+  color:#c68cff;
+  font-size:10px;
+  font-weight:900;
+}
+
+/* ================= BUTTONS ================= */
+
+.primary{
+  width:100%;
+  background:linear-gradient(90deg,#8b3dff,#d934ff);
+  border:0;
+  color:#fff;
+  font-weight:950;
+  padding:12px;
+  border-radius:11px;
+  box-shadow:
+    0 5px 20px rgba(155,77,255,.22),
+    inset 0 1px rgba(255,255,255,.15);
+  transition:.2s;
+}
+
+.primary:hover{
+  transform:translateY(-1px);
+  box-shadow:
+    0 7px 25px rgba(155,77,255,.35),
+    inset 0 1px rgba(255,255,255,.18);
+}
+
+.danger{
+  background:#2a1117;
+  border:1px solid #62202c;
+  color:#ff7777;
+}
+
+.ok{
+  color:var(--ok);
+}
+
+/* ================= LAYOUT ================= */
+
+.stack{
+  display:grid;
+  gap:12px;
+}
+
+.row{
+  display:flex;
+  gap:10px;
+  align-items:center;
+  justify-content:space-between;
+  flex-wrap:wrap;
+}
+
+.actions{
+  display:flex;
+  gap:7px;
+  flex-wrap:wrap;
+}
+
+.actions button{
+  padding:8px 10px;
+  border-radius:9px;
+  border:1px solid #333;
+  background:#17131d;
+  color:#eee;
+}
+
+/* ================= FORM ================= */
+
+.form{
+  display:grid;
+  gap:10px;
+}
+
+.form input,
+.form select,
+.form textarea{
+  width:100%;
+  background:#0a0810;
+  border:1px solid #30283a;
+  color:#fff;
+  padding:12px;
+  border-radius:10px;
+  outline:none;
+}
+
+.form input:focus,
+.form select:focus,
+.form textarea:focus{
+  border-color:var(--purple);
+  box-shadow:0 0 0 3px rgba(155,77,255,.1);
+}
+
+.form label{
+  font-size:12px;
+  color:#aaa;
+}
+
+/* ================= ADMIN ================= */
+
+.admin-tabs{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-bottom:15px;
+}
+
+.admin-tabs button{
+  padding:9px 12px;
+}
+
+/* ================= TABLE ================= */
+
+.table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:13px;
+  background:#0d0a12;
+  border-radius:12px;
+  overflow:hidden;
+}
+
+.table th,
+.table td{
+  padding:10px;
+  border-bottom:1px solid #211c29;
+  text-align:left;
+  vertical-align:top;
+}
+
+.table th{
+  color:#c58bff;
+  font-weight:900;
+}
+
+/* ================= MODAL ================= */
+
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.78);
+  display:grid;
+  place-items:center;
+  padding:16px;
+  z-index:500;
+  backdrop-filter:blur(7px);
+}
+
+.modal-card{
+  width:min(650px,100%);
+  max-height:90vh;
+  overflow:auto;
+  background:
+    radial-gradient(circle at 50% 0,rgba(130,40,255,.15),transparent 40%),
+    #12101a;
+  border:1px solid #39274b;
+  border-radius:20px;
+  padding:20px;
+  position:relative;
+  box-shadow:0 25px 80px rgba(0,0,0,.65);
+}
+
+.close{
+  position:absolute;
+  right:12px;
+  top:8px;
+  background:none;
+  border:0;
+  color:#aaa;
+  font-size:28px;
+}
+
+/* ================= QR ================= */
+
+.qr{
+  max-width:240px;
+  width:100%;
+  display:block;
+  margin:10px auto;
+  border-radius:12px;
+  background:white;
+  padding:8px;
+}
+
+/* ================= TOAST ================= */
+
+.toast{
+  position:fixed;
+  bottom:88px;
+  left:50%;
+  transform:translateX(-50%);
+  background:#1d1724;
+  border:1px solid #493158;
+  padding:11px 15px;
+  border-radius:12px;
+  display:none;
+  z-index:800;
+  box-shadow:0 8px 30px rgba(0,0,0,.4);
+}
+
+.toast.show{
+  display:block;
+}
+
+.hidden{
+  display:none!important;
+}
+
+/* ================= MOBILE BOTTOM NAV ================= */
+
+@media(max-width:700px){
+
+  body{
+    padding-bottom:82px;
+  }
+
+  .topbar{
+    height:62px;
+    padding:8px 12px;
+    flex-direction:row;
+    align-items:center;
+    gap:8px;
+  }
+
+  .brand{
+    font-size:15px;
+  }
+
+  .brand img{
+    width:36px;
+    height:36px;
+  }
+
+  .topbar nav{
+    gap:5px;
+  }
+
+  .topbar nav button{
+    padding:8px 9px;
+    font-size:11px;
+  }
+
+  /*
+    Existing top navigation remains functional.
+    On small screens it becomes compact.
+  */
+
+  .page{
+    padding:14px 12px 100px;
+  }
+
+  .hero{
+    min-height:220px;
+    padding:20px;
+    border-radius:20px;
+  }
+
+  .hero h1{
+    font-size:36px;
+    letter-spacing:-1.5px;
+  }
+
+  .hero p{
+    font-size:13px;
+  }
+
+  .hero img{
+    width:120px;
+    max-height:170px;
+  }
+
+  .grid{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:10px;
+  }
+
+  .card{
+    padding:12px;
+    border-radius:15px;
+  }
+
+  .tcard h3{
+    font-size:14px;
+  }
+
+  .meta{
+    gap:6px;
+  }
+
+  .meta div{
+    padding:7px;
+    font-size:11px;
+  }
+
+  .primary{
+    padding:10px;
+    font-size:12px;
+  }
+
+  .table{
+    font-size:10px;
+  }
+
+  .table th,
+  .table td{
+    padding:7px;
+  }
+}
+
+/* ================= VERY SMALL MOBILE ================= */
+
+@media(max-width:390px){
+
+  .brand{
+    font-size:13px;
+  }
+
+  .brand img{
+    width:32px;
+    height:32px;
+  }
+
+  .topbar nav button{
+    padding:7px;
+    font-size:10px;
+  }
+
+  .hero{
+    padding:16px;
+  }
+
+  .hero h1{
+    font-size:30px;
+  }
+
+  .hero img{
+    width:95px;
+  }
+
+  .grid{
+    gap:8px;
+  }
+}
+
+/* ================= DESKTOP ================= */
+
+@media(min-width:701px){
+
+  .page{
+    min-height:calc(100vh - 68px);
+  }
+
+  .hero{
+    margin-top:6px;
+  }
+}
+
+/* ================= HKR GAMING HOME UPGRADE ================= */
+
+#home{
+  position:relative;
+}
+
+/* Gaming section title */
+#home .section-head{
+  margin-top:30px;
+}
+
+#home .section-head h2{
+  font-size:21px;
+  letter-spacing:.3px;
+}
+
+/* Tournament cards */
+#tournamentGrid .tcard{
+  position:relative;
+  min-height:190px;
+  background:
+    radial-gradient(circle at 100% 0,rgba(178,58,255,.16),transparent 42%),
+    linear-gradient(145deg,#191321,#0d0a12);
+}
+
+#tournamentGrid .tcard:after{
+  content:"";
+  position:absolute;
+  width:90px;
+  height:90px;
+  right:-35px;
+  bottom:-40px;
+  border-radius:50%;
+  background:rgba(170,55,255,.12);
+  filter:blur(10px);
+  pointer-events:none;
+}
+
+/* Tournament heading */
+#tournamentGrid .tcard h3{
+  color:#fff;
+  font-size:17px;
+}
+
+/* Tournament meta boxes */
+#tournamentGrid .meta div{
+  border:1px solid #282031;
+  background:#0a0810;
+}
+
+#tournamentGrid .meta div:first-child{
+  color:#c98dff;
+}
+
+/* Join button */
+#tournamentGrid .primary{
+  background:linear-gradient(100deg,#7b2cff,#d82cff);
+  color:#fff;
+  box-shadow:0 5px 20px rgba(142,49,255,.25);
+}
+
+/* Refresh button */
+#refreshBtn{
+  background:#15101d!important;
+  color:#c994ff!important;
+  border:1px solid #38264b!important;
+}
+
+/* Empty/loading state */
+#tournamentGrid:empty:after{
+  content:"No tournaments available";
+  display:block;
+  text-align:center;
+  padding:40px 15px;
+  color:#777080;
+  font-size:13px;
+}
+
+/* ================= MOBILE HOME ================= */
+
+@media(max-width:700px){
+
+  #home .section-head{
+    margin-top:22px;
+  }
+
+  #home .section-head h2{
+    font-size:18px;
+  }
+
+  #tournamentGrid{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  #tournamentGrid .tcard{
+    min-height:175px;
+    padding:12px;
+  }
+
+  #tournamentGrid .tcard h3{
+    font-size:13px;
+    line-height:1.3;
+  }
+
+  #tournamentGrid .muted{
+    font-size:10px;
+  }
+
+  #tournamentGrid .price{
+    font-size:12px;
+  }
+
+  #tournamentGrid .meta{
+    grid-template-columns:1fr 1fr;
+  }
+
+  #tournamentGrid .meta div{
+    padding:7px 5px;
+    font-size:10px;
+  }
+
+  #tournamentGrid .primary{
+    font-size:11px;
+    padding:9px 5px;
+  }
+}
+
+/* ================= GLOW ================= */
+
+@keyframes hkrGlow{
+  0%,100%{
+    box-shadow:0 0 15px rgba(155,77,255,.08);
+  }
+  50%{
+    box-shadow:0 0 28px rgba(155,77,255,.18);
+  }
+}
+
+#tournamentGrid .tcard{
+  animation:hkrGlow 3s ease-in-out infinite;
+}
