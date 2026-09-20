@@ -11879,6 +11879,8 @@ console.log(
    SUCCESS  
    ======================================================== */  
 
+
+
 if(statusBox){  
 
   statusBox.innerHTML = `  
@@ -11895,14 +11897,9 @@ if(statusBox){
 
 }  
 
-
-toast(  
-  'Payment request submitted successfully'  
-);  
-
+toast('Payment request submitted successfully ✅');  
 
 closeAddMoneyModal();  
-
 
 await loadWallet();
 
@@ -11976,9 +11973,7 @@ if(statusBox){
 }  
 
 
-toast(  
-  'Add Money request failed'  
-);
+toast('Add Money failed: ' + (error?.message || 'Unknown error'));
 
 }finally{
 
