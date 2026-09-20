@@ -5042,11 +5042,14 @@ $$('[data-view-id]').forEach(btn => {
       return;  
     }  
 
-    const t = normalizeTournament(data);  
+      const t = normalizeTournament(data);  
 
-    /* ===== TITLE ===== */  
+/* ===== APPLY EFFECTIVE STATUS (AUTO/MANUAL) ===== */  
+t.status = getEffectiveStatus(t);  
 
-    $('#tdTitle').textContent = t.name;  
+/* ===== TITLE ===== */  
+
+$('#tdTitle').textContent = t.name;  
 
     $('#tdSubTitle').textContent =  
       (t.match_id ? t.match_id + ' • ' : '') +  
