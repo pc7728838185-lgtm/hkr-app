@@ -12926,6 +12926,26 @@ setTimeout(() => {
 init();
   
 </script>  
-  
+  /* ===== PREVENT PULL-TO-REFRESH ===== */
+
+let _touchStartY = 0;
+
+document.addEventListener('touchstart', function(e){
+  if(e.touches.length === 1){
+    _touchStartY = e.touches[0].clientY;
+  }
+}, { passive: true });
+
+document.addEventListener('touchmove', function(e){
+  if(e.touches.length !== 1) return;
+
+  const currentY = e.touches[0].clientY;
+  const diff = currentY - _touchStartY;
+
+  /* Agar page top pe hai aur user neeche kheench raha hai */
+  if(window.scrollY <= 0 && diff > 0){
+    e.preventDefault();
+  }
+}, { passive: false });
 </body>  
 </html> 
