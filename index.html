@@ -3642,7 +3642,10 @@ type="button"
 
       </div>  
 
-
+<div class="field">  
+  <label>SUPPORT EMAIL</label>  
+  <input id="setSupportEmail" type="email" placeholder="support@example.com">  
+</div>  
       <button  
         class="btn"  
         id="saveSettingsBtn"  
@@ -3976,6 +3979,10 @@ function applySettings(){
   
   $('#setSupport').value =  
     settings.support || '';  
+
+if($('#setSupportEmail')){  
+  $('#setSupportEmail').value = settings.support_email || '';  
+}  
   
   renderQrPreview();  
   
@@ -9778,8 +9785,8 @@ $('#adminLogoutBtn').addEventListener(
    PROFILE MENU SYSTEM
    ============================================================ */
 
-/* ===== CUSTOMER SUPPORT EMAIL (yahan change karo) ===== */
-const SUPPORT_EMAIL = 'bx81myr@gmail.com';
+/* SUPPORT_EMAIL ab settings se aayega */
+
 
 /* ===== APP LINK FOR SHARE ===== */
 const APP_SHARE_LINK = (location.origin && location.origin !== 'null')
@@ -9962,7 +9969,7 @@ function openCustomerSupport(){
             Email Us
           </div>
           <div style="font-size:14px;font-weight:900;word-break:break-all;" id="supportEmailText">
-            ${escapeHtml(SUPPORT_EMAIL)}
+            ${escapeHtml(settings.support_email || 'bx81myr@gmail.com')}
           </div>
         </div>
 
@@ -10003,7 +10010,7 @@ function openCustomerSupport(){
 
   document.getElementById('supportCopyBtn').onclick = async () => {
     try{
-      await navigator.clipboard.writeText(SUPPORT_EMAIL);
+      await navigator.clipboard.writeText(settings.support_email || 'bx81myr@gmail.com');
       toast('Email copied');
     }catch(e){
       toast('Copy failed');
@@ -10011,7 +10018,7 @@ function openCustomerSupport(){
   };
 
   document.getElementById('supportMailBtn').onclick = () => {
-    window.location.href = 'mailto:' + SUPPORT_EMAIL +
+    window.location.href = 'mailto:' + (settings.support_email || 'bx81myr@gmail.com') +
       '?subject=' + encodeURIComponent('HKR Tournaments - Support') +
       '&body=' + encodeURIComponent('User Email: ' + (currentUser?.email || 'N/A') + '\n\nHello Team,\n\n');
   };
