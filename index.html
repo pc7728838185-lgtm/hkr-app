@@ -2950,15 +2950,12 @@
 
 <section id="tournaments" class="page">  
 
-  <div class="row" style="margin-bottom:12px">  
-
-    <h2  
-      id="tournamentHeading"  
-      style="margin:0"  
-    >  
-      All Tournaments  
-    </h2>  
-
+  <div class="td-header" style="margin-bottom:14px">
+    <button class="td-back-btn" id="tournamentsBackBtn" type="button">←</button>
+    <div class="td-header-info">
+      <div class="td-header-title" id="tournamentHeading">All Tournaments</div>
+      <div class="td-header-sub">Choose your match</div>
+    </div>
     <button  
       class="small-btn"  
       id="allTournamentBtn"  
@@ -2966,8 +2963,7 @@
     >  
       ALL  
     </button>  
-
-  </div>  
+  </div>
 
 <!-- ===== TABS ===== -->  
 
@@ -3123,16 +3119,12 @@
 
 <section id="admin" class="page">  
 
-  <div class="admin-header">  
-
-    <div class="admin-header-title">  
-      🛠️ Admin Control Center  
-    </div>  
-
-    <div class="admin-header-sub">  
-      Manage tournaments, payments and app settings.  
-    </div>  
-
+  <div class="td-header" style="margin-bottom:14px">
+    <button class="td-back-btn" id="adminBackBtn" type="button">←</button>
+    <div class="td-header-info">
+      <div class="td-header-title">🛠️ Admin Control Center</div>
+      <div class="td-header-sub">Manage tournaments and settings</div>
+    </div>
   </div>
 
 <div class="admin-tabs">  <button
@@ -7206,6 +7198,12 @@ $('#allTournamentBtn').addEventListener(
   
   }  
 );  
+  /* ===== TOURNAMENTS BACK BUTTON ===== */
+
+$('#tournamentsBackBtn')?.addEventListener('click', () => {
+  selectedCategory = null;
+  show('home');
+});
 /* ============================================================
 ADMIN ROLE CHECK
 ============================================================ */
@@ -7321,7 +7319,11 @@ async () => {
 
 }
 );
+/* ===== ADMIN BACK BUTTON ===== */
 
+$('#adminBackBtn')?.addEventListener('click', () => {
+  show('home');
+});
 $('#saveTournamentBtn').addEventListener(
 'click',
 async () => {
