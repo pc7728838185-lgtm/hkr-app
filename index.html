@@ -2179,6 +2179,84 @@
   font-weight:900;
 }
 
+    /* ================= MY CHALLENGES ================= */
+
+.mc-card{
+  background:linear-gradient(145deg,#1a1625,#0e0d17);
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:16px;
+  padding:14px;
+  margin-bottom:12px;
+  cursor:default;
+}
+
+.mc-card-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:10px;
+}
+
+.mc-card-title{
+  font-size:13px;
+  font-weight:1000;
+  color:#fff;
+  text-transform:uppercase;
+  line-height:1.2;
+  word-break:break-word;
+  flex:1;
+  min-width:0;
+}
+
+.mc-card-badge{
+  padding:4px 9px;
+  border-radius:7px;
+  font-size:9px;
+  font-weight:1000;
+  text-transform:uppercase;
+  letter-spacing:.4px;
+  flex-shrink:0;
+}
+
+.mc-badge-upcoming{
+  background:linear-gradient(135deg,#7e35ff,#ef29b5);
+  color:#fff;
+}
+
+.mc-badge-ongoing{
+  background:linear-gradient(135deg,#16a34a,#22c55e);
+  color:#fff;
+}
+
+.mc-badge-result{
+  background:linear-gradient(135deg,#f59e0b,#fbbf24);
+  color:#fff;
+}
+
+.mc-card-info{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  font-size:11px;
+  color:#a49ead;
+  font-weight:700;
+}
+
+.mc-card-info span{
+  padding:3px 8px;
+  border-radius:6px;
+  background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.08);
+}
+
+.mc-card-time{
+  margin-top:8px;
+  font-size:11px;
+  color:#c187ff;
+  font-weight:900;
+}
+
 /* ================= PROFILE CONTENT PAGE ================= */
 
 .pc-content{
@@ -2816,6 +2894,13 @@
       <span class="profile-menu-arrow">›</span>
     </button>
 
+<button class="profile-menu-item" data-profile-action="my-challenges" type="button">
+  <span class="profile-menu-icon">🎮</span>
+  <span class="profile-menu-label">My Challenges</span>
+  <span class="profile-menu-arrow">›</span>
+</button>
+
+    
     <button class="profile-menu-item" data-profile-action="share" type="button">
       <span class="profile-menu-icon">📤</span>
       <span class="profile-menu-label">Share App</span>
@@ -2850,7 +2935,22 @@
 
 </section>
 
-    
+    <!-- ================= MY CHALLENGES PAGE ================= -->
+
+<section id="myChallengesPage" class="page">
+
+  <div class="td-header">
+    <button class="td-back-btn" id="mcBackBtn" type="button">←</button>
+    <div class="td-header-info">
+      <div class="td-header-title">My Challenges</div>
+      <div class="td-header-sub" id="mcSubTitle">Aapke joined tournaments</div>
+    </div>
+  </div>
+
+  <div id="mcContent"></div>
+
+</section>
+
 <!-- ================= PROFILE CONTENT PAGE ================= -->
 
 <section id="profileContentPage" class="page">
@@ -9965,6 +10065,232 @@ const PRIVACY_CONTENT =
 
 Ye section jald hi update hoga. Tab tak koi bhi query ke liye Customer Support se contact karein.`;
 
+  /* ===== MY CHALLENGES PAGE ===== */
+
+let _mcCurrentTab = 'all';
+
+async function openMyChallengesPage(){
+
+  if(!sb || !currentUser){
+    toast('Pehle login karo');
+    return;
+  }
+
+  const content = $('#mcContent');
+  if(!content) return;
+
+  content.innerHTML = `
+    <div class="empty">
+      <div class="empty-icon">⏳</div>
+      <div class="empty-title">Loading your challenges...</div>
+    </div>
+  `;
+
+  show('myChallengesPage');
+
+  $('#mcBackBtn').onclick = () => show('profile');
+
+  try{
+
+    const { data: entries, error: eErr } = await sb
+      .from('tournament_entries')
+      .select('id, tournament_id, ff_username, ff_uid, created_at')
+      .eq('user_id', currentUser.id)
+      .order('created_at', { ascending: false });
+
+    if(eErr) throw eErr;
+
+    if(!entries || entries.length === 0){
+      content.innerHTML = `
+        <div class="empty">
+          <div class="empty-icon">🎮</div>
+          <div class="empty-title">No challenges yet</div>
+          <div class="empty-text">Aapne abhi tak koi tournament join nahi kiya.</div>
+        </div>
+      `;
+      return;
+    }
+
+    const tIds = [...new Set(entries.map(e => e.tournament_id))];
+
+    const { data: tournaments, error: tErr } = await sb
+      .from('tournaments')
+      .select('*')
+      .in('id', tIds);
+
+    if(tErr) throw tErr;
+
+    const tMap = {};
+    (tournaments || []).forEach(t => {
+      const normalized = normalizeTournament(t);
+      if(normalized){
+        normalized.status = getEffectiveStatus(normalized);
+        tMap[t.id] = normalized;
+      }
+    });
+
+    const allList = entries
+      .map(e => tMap[e.tournament_id])
+      .filter(Boolean);
+
+    function renderChallenges(){
+
+      let list = [...allList];
+
+      if(_mcCurrentTab === 'ongoing'){
+        list = list.filter(t => t.status === 'ongoing');
+      }else if(_mcCurrentTab === 'upcoming'){
+        list = list.filter(t => t.status === 'upcoming');
+      }else if(_mcCurrentTab === 'result'){
+        list = list.filter(t => t.status === 'result');
+      }
+
+      const orderMap = { ongoing: 0, upcoming: 1, result: 2 };
+      list.sort((a, b) => {
+        const oa = orderMap[a.status] ?? 3;
+        const ob = orderMap[b.status] ?? 3;
+        if(oa !== ob) return oa - ob;
+        return new Date(b.timeRaw || 0) - new Date(a.timeRaw || 0);
+      });
+
+      $('#mcSubTitle').textContent =
+        list.length + ' ' + (list.length === 1 ? 'challenge' : 'challenges');
+
+      if(list.length === 0){
+        content.innerHTML = `
+          <div class="t-tabs-wrap" style="margin-bottom:14px">
+            ${renderMCTabs()}
+          </div>
+          <div class="empty">
+            <div class="empty-icon">📭</div>
+            <div class="empty-title">No ${_mcCurrentTab === 'all' ? '' : _mcCurrentTab} challenges</div>
+            <div class="empty-text">Is section me abhi kuch nahi hai.</div>
+          </div>
+        `;
+        attachMCTabEvents();
+        return;
+      }
+
+      const cardsHtml = list.map(t => {
+
+        const status = t.status || 'upcoming';
+
+        let badgeClass = 'mc-badge-upcoming';
+        let badgeText = '⏳ UPCOMING';
+
+        if(status === 'ongoing'){
+          badgeClass = 'mc-badge-ongoing';
+          badgeText = '🔴 LIVE';
+        }else if(status === 'result'){
+          badgeClass = 'mc-badge-result';
+          badgeText = '🏆 RESULT';
+        }
+
+        return `
+          <div class="mc-card">
+
+            <div class="mc-card-header">
+              <div class="mc-card-title">${escapeHtml(t.name)}</div>
+              <div class="mc-card-badge ${badgeClass}">${badgeText}</div>
+            </div>
+
+            <div style="margin-bottom:10px;">
+              <span style="
+                display:inline-block;
+                padding:4px 10px;
+                border-radius:8px;
+                background:linear-gradient(135deg,rgba(139,61,255,.22),rgba(201,63,255,.12));
+                border:1px solid rgba(139,61,255,.35);
+                color:#d4a5ff;
+                font-size:10px;
+                font-weight:1000;
+                letter-spacing:.4px;
+                text-transform:uppercase;
+              ">
+                🎮 ${escapeHtml(categoryLabel(t.category))}
+              </span>
+            </div>
+
+            <div class="mc-card-info">
+              ${t.match_id ? `<span>${escapeHtml(t.match_id)}</span>` : ''}
+              <span>${escapeHtml(t.tournament_type || 'Solo')}</span>
+              <span>${escapeHtml(t.version || 'TPP')}</span>
+              <span>${escapeHtml(t.mode || 'Map')}</span>
+              <span>Entry ₹${escapeHtml(String(t.entryNumber || 0))}</span>
+            </div>
+
+            <div class="mc-card-time">
+              🕐 ${escapeHtml(t.time || 'Time not set')}
+            </div>
+
+          </div>
+        `;
+
+      }).join('');
+
+      content.innerHTML = `
+        <div class="t-tabs-wrap" style="margin-bottom:14px">
+          ${renderMCTabs()}
+        </div>
+        ${cardsHtml}
+      `;
+
+      attachMCTabEvents();
+
+    }
+
+    function renderMCTabs(){
+
+      const counts = {
+        all: allList.length,
+        ongoing: allList.filter(t => t.status === 'ongoing').length,
+        upcoming: allList.filter(t => t.status === 'upcoming').length,
+        result: allList.filter(t => t.status === 'result').length
+      };
+
+      return `
+        <button class="t-tab ${_mcCurrentTab === 'all' ? 'active' : ''}" data-mc-tab="all" type="button">
+          All (${counts.all})
+        </button>
+        <button class="t-tab ${_mcCurrentTab === 'ongoing' ? 'active' : ''}" data-mc-tab="ongoing" type="button">
+          Live (${counts.ongoing})
+        </button>
+        <button class="t-tab ${_mcCurrentTab === 'upcoming' ? 'active' : ''}" data-mc-tab="upcoming" type="button">
+          Upcoming (${counts.upcoming})
+        </button>
+        <button class="t-tab ${_mcCurrentTab === 'result' ? 'active' : ''}" data-mc-tab="result" type="button">
+          Result (${counts.result})
+        </button>
+      `;
+    }
+
+    function attachMCTabEvents(){
+      content.querySelectorAll('[data-mc-tab]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          _mcCurrentTab = btn.dataset.mcTab || 'all';
+          renderChallenges();
+        });
+      });
+    }
+
+    renderChallenges();
+
+  }catch(err){
+
+    console.error('MY CHALLENGES ERROR:', err);
+
+    content.innerHTML = `
+      <div class="empty">
+        <div class="empty-icon">⚠️</div>
+        <div class="empty-title">Challenges unavailable</div>
+        <div class="empty-text">${escapeHtml(err?.message || 'Unknown error')}</div>
+      </div>
+    `;
+
+  }
+
+}
+
 /* ===== OPEN CONTENT PAGE ===== */
 
 function openProfileContentPage(action){
@@ -10037,6 +10363,12 @@ $$('.profile-menu-item').forEach(btn => {
       openCustomerSupport();
       return;
     }
+
+    /* MY CHALLENGES */
+if(action === 'my-challenges'){
+  openMyChallengesPage();
+  return;
+}
 
     /* SHARE APP */
     if(action === 'share'){
