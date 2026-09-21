@@ -3796,7 +3796,19 @@ type="button"
     >  
       💾 SAVE RESULTS  
     </button>  
+<button  
+  class="btn"  
+  id="arReleasePrizesBtn"  
+  type="button"  
+  style="display:none;background:linear-gradient(135deg,#16a34a,#22c55e);margin-top:8px"  
+>  
+  💰 RELEASE PRIZES TO WINNERS  
+</button>  
 
+<div  
+  id="arReleaseStatus"  
+  style="margin-top:10px;font-size:12px;color:#a49ead;text-align:center"  
+></div>  
   </div>  
 
 </div>  
@@ -8765,12 +8777,93 @@ let html = `
 
   list.innerHTML = html;  
 
-  /* Show Save button */  
+/* Show Save button */  
 
-  $('#arSaveResultsBtn').style.display = 'block';  
+$('#arSaveResultsBtn').style.display = 'block';  
+
+/* Show Release button */  
+$('#arReleasePrizesBtn').style.display = 'block';  
 
 }  
 
+/* ============================================================  
+   RELEASE PRIZES HANDLER  
+   ============================================================ */  
+
+$('#arReleasePrizesBtn')?.addEventListener('click', async () => {
+
+  const btn = $('#arReleasePrizesBtn');
+  const statusBox = $('#arReleaseStatus');
+  const tournamentId = $('#arTournamentSelect').value;
+
+  if(!tournamentId){
+    toast('Pehle tournament select karo');
+    return;
+  }
+
+  if(!sb){
+    toast('Database connected nahi hai');
+    return;
+  }
+
+  const confirmed = confirm(
+    '⚠️ YE ACTION PAISA TRANSFER KAREGA!\n\n' +
+    'Saare winners ke wallet me prize amount add ho jayega.\n\n' +
+    'Kya aap sure hain?'
+  );
+
+  if(!confirmed) return;
+
+  if(btn){
+    btn.disabled = true;
+    btn.textContent = '⏳ RELEASING...';
+  }
+
+  if(statusBox){
+    statusBox.innerHTML = '⏳ Winners ke wallet me paisa daala ja raha hai...';
+  }
+
+  try{
+
+    const { data, error } = await sb.rpc(
+      'release_tournament_prizes',
+      { p_tournament_id: tournamentId }
+    );
+
+    if(error) throw error;
+
+    if(!data || !data.success){
+      throw new Error(data?.error || 'Failed');
+    }
+
+    const msg = `✅ ${data.users_paid} winners ko ₹${data.total_amount} mila!`;
+
+    toast(msg);
+
+    if(statusBox){
+      statusBox.innerHTML = `<span style="color:#6ee7a0;font-weight:900">${msg}</span>`;
+    }
+
+  }catch(err){
+
+    console.error('RELEASE PRIZES ERROR:', err);
+
+    toast('Release failed: ' + (err.message || 'Unknown'));
+
+    if(statusBox){
+      statusBox.innerHTML = `<span style="color:#ff8b8b">❌ ${escapeHtml(err?.message || 'Failed')}</span>`;
+    }
+
+  }finally{
+
+    if(btn){
+      btn.disabled = false;
+      btn.textContent = '💰 RELEASE PRIZES TO WINNERS';
+    }
+
+  }
+
+});
 
 /* ============================================================  
    RESULTS — SAVE HANDLER  
