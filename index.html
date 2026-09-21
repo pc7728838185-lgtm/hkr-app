@@ -3728,7 +3728,8 @@ const HKR_DEFAULT_SETTINGS = {
   upi_id: '',  
   upi_name: 'HKR Tournaments',  
   qr_url: '',  
-  support: 'Contact admin'  
+  support: 'Contact admin',  
+  support_email: 'bx81myr@gmail.com'  
 };  
   
 let settings = {  
@@ -3901,44 +3902,51 @@ function initSupabase(){
    LOCAL SETTINGS  
    ============================================================ */  
   
-function loadSettings(){  
-  
+async function loadSettings(){  
   try{  
-  
-    const saved =  
-      JSON.parse(  
-        localStorage.getItem('HKR_ADMIN_SETTINGS') || 'null'  
-      );  
-  
-    if(saved && typeof saved === 'object'){  
-  
-      settings = {  
-        ...HKR_DEFAULT_SETTINGS,  
-        ...saved  
-      };  
-  
+    if(sb){  
+      const { data, error } = await sb  
+        .from('app_settings')  
+        .select('app_name, upi_id, upi_name, qr_url, support, support_email')  
+        .eq('id', 1)  
+        .maybeSingle();  
+      if(!error && data){  
+        settings = {  
+          app_name: data.app_name || HKR_DEFAULT_SETTINGS.app_name,  
+          upi_id: data.upi_id || '',  
+          upi_name: data.upi_name || HKR_DEFAULT_SETTINGS.upi_name,  
+          qr_url: data.qr_url || '',  
+          support: data.support || HKR_DEFAULT_SETTINGS.support,  
+          support_email: data.support_email || 'bx81myr@gmail.com'  
+        };  
+        applySettings();  
+        return;  
+      }  
     }  
-  
   }catch(err){  
-  
-    settings = {  
-      ...HKR_DEFAULT_SETTINGS  
-    };  
-  
+    console.error('Settings load error:', err);  
   }  
-  
+  try{  
+    const saved = JSON.parse(localStorage.getItem('HKR_ADMIN_SETTINGS') || 'null');  
+    if(saved && typeof saved === 'object'){ settings = {...HKR_DEFAULT_SETTINGS, ...saved}; }  
+  }catch(err){ settings = {...HKR_DEFAULT_SETTINGS}; }  
   applySettings();  
-  
 }  
   
   
-function saveSettingsLocal(){  
-  
-  localStorage.setItem(  
-    'HKR_ADMIN_SETTINGS',  
-    JSON.stringify(settings)  
-  );  
-  
+async function saveSettingsLocal(){  
+  try{ localStorage.setItem('HKR_ADMIN_SETTINGS', JSON.stringify(settings)); }catch(e){}  
+  if(sb){  
+    const { error } = await sb  
+      .from('app_settings')  
+      .update({  
+        app_name: settings.app_name, upi_id: settings.upi_id, upi_name: settings.upi_name,  
+        qr_url: settings.qr_url, support: settings.support, support_email: settings.support_email,  
+        updated_at: new Date().toISOString()  
+      })  
+      .eq('id', 1);  
+    if(error){ throw error; }  
+  }  
 }  
   
   
@@ -9699,43 +9707,25 @@ $('#refreshAddMoneyRequestsBtn')
    SETTINGS SAVE  
    ============================================================ */  
   
-$('#saveSettingsBtn').addEventListener(  
-  'click',  
-  () => {  
-  
-    settings = {  
-  
-      app_name:  
-        $('#setAppName').value.trim() ||  
-        HKR_DEFAULT_SETTINGS.app_name,  
-  
-      upi_id:  
-        $('#setUpiId').value.trim(),  
-  
-      upi_name:  
-        $('#setUpiName').value.trim() ||  
-        HKR_DEFAULT_SETTINGS.upi_name,  
-  
-      qr_url:  
-        $('#setQrUrl').value.trim(),  
-  
-      support:  
-        $('#setSupport').value.trim() ||  
-        HKR_DEFAULT_SETTINGS.support  
-  
-    };  
-  
-  
-    saveSettingsLocal();  
-  
-    applySettings();  
-  
-    toast(  
-      'Settings saved successfully'  
-    );  
-  
+$('#saveSettingsBtn').addEventListener('click', async () => {  
+  const btn = $('#saveSettingsBtn');  
+  if(btn){ btn.disabled = true; btn.textContent = '⏳ Saving...'; }  
+  settings = {  
+    app_name: $('#setAppName').value.trim() || HKR_DEFAULT_SETTINGS.app_name,  
+    upi_id: $('#setUpiId').value.trim(),  
+    upi_name: $('#setUpiName').value.trim() || HKR_DEFAULT_SETTINGS.upi_name,  
+    qr_url: $('#setQrUrl').value.trim(),  
+    support: $('#setSupport').value.trim() || HKR_DEFAULT_SETTINGS.support,  
+    support_email: $('#setSupportEmail')?.value.trim() || 'bx81myr@gmail.com'  
+  };  
+  try{  
+    await saveSettingsLocal(); applySettings(); toast('Settings saved successfully ✅');  
+  }catch(err){  
+    console.error(err); toast('Settings save failed: ' + (err.message || 'Unknown'));  
+  }finally{  
+    if(btn){ btn.disabled = false; btn.textContent = '💾 SAVE SETTINGS'; }  
   }  
-);  
+});  
   
   
 /* ============================================================  
