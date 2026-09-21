@@ -4403,7 +4403,7 @@ function renderGames(){
   
       show('tournaments');  
   
-      renderTournaments(category);  
+        
   
     });  
   
@@ -6536,334 +6536,211 @@ if(showRoom && tournament.room_id){
 /* ============================================================  
    RENDER ONLINE TOURNAMENTS  
    ============================================================ */  
-  
-async function renderTournaments(category = null){  
-  
-  selectedCategory = category || null;  
-  
-  const list = $('#list');  
-  const heading = $('#tournamentHeading');  
-  const banner = $('#categoryBanner');  
-  
-  if(!list) return;  
-  
-  list.innerHTML = `  
-    <div class="empty">  
-      <div class="empty-icon">⏳</div>  
-      <div class="empty-title">  
-        Loading tournaments...  
-      </div>  
-      <div class="empty-text">  
-        Supabase से tournaments load हो रहे हैं।  
-      </div>  
-    </div>  
-  `;  
-  
-  if(category){  
-  
-    const label = categoryLabel(category);  
-  
-    if(heading){  
-  
-      heading.textContent =  
-        label + ' Tournaments';  
-  
-    }  
-  
-    if(banner){  
-  
-      banner.classList.remove('hidden');  
-  
-      banner.innerHTML = `  
-        <strong>  
-          🎮 ${escapeHtml(label)}  
-        </strong>  
-  
-         
-      `;  
-  
-    }  
-  
-  }else{  
-  
-    if(heading){  
-  
-      heading.textContent =  
-        'All Tournaments';  
-  
-    }  
-  
-    if(banner){  
-  
-      banner.classList.add('hidden');  
-  
-      banner.innerHTML = '';  
-  
-    }  
-  
-  }  
-  
-  const tournaments =  
-    await getOnlineTournaments(category);  
-  
-  
-  if(tournaments.length === 0){  
-  
-    list.innerHTML = `  
-      <div class="empty">  
-  
-        <div class="empty-icon">  
-          🏆  
-        </div>  
-  
-        <div class="empty-title">  
-          No tournaments available  
-        </div>  
-  
-        <div class="empty-text">  
-          इस category में अभी कोई published tournament नहीं है।  
-        </div>  
-  
-      </div>  
-    `;  
-  
-    return;  
-  
-  }  
-  
-  
-/* ===== SIRF UPCOMING FILTER KARO ===== */  
-
-const upcomingOnly = tournaments.filter(  
-  t => t.status === 'upcoming'  
-);  
 
-if(upcomingOnly.length === 0){  
 
-  list.innerHTML = `  
-    <div class="empty">  
-      <div class="empty-icon">📅</div>  
-      <div class="empty-title">No upcoming tournaments</div>  
-      <div class="empty-text">  
-        Abhi koi upcoming match nahi hai.  
-      </div>  
-    </div>  
-  `;  
-/* ===== TABS EVENT BINDING (blank pe bhi kaam kare) ===== */  
 
-$$('.t-tab').forEach(tab => {  
+  /* ============================================================  
+   TOURNAMENT TABS SETUP (SIRF EK BAAR)  
+   ============================================================ */  
 
-  tab.onclick = async () => {  
+function setupTournamentTabs(){
 
-    const tabName = tab.dataset.tTab;  
+  $$('.t-tab').forEach(tab => {
 
-    $$('.t-tab').forEach(t => {  
-      t.classList.toggle('active', t.dataset.tTab === tabName);  
-    });  
+    if(tab.dataset.bound === 'true') return;
+    tab.dataset.bound = 'true';
 
-    /* ===== ONGOING ===== */  
+    tab.addEventListener('click', async () => {
 
-    if(tabName === 'ongoing'){  
+      const tabName = tab.dataset.tTab;
 
-      $('#list').innerHTML = `  
-        <div class="empty">  
-          <div class="empty-icon">⏳</div>  
-          <div class="empty-title">Loading ongoing...</div>  
-        </div>  
-      `;  
+      $$('.t-tab').forEach(t => {
+        t.classList.toggle('active', t.dataset.tTab === tabName);
+      });
 
-      const allOngoing = await getOnlineTournaments(selectedCategory);  
+      if(tabName === 'ongoing'){
+        await loadOngoingTab();
+      } else if(tabName === 'result'){
+        await loadResultTab();
+      } else {
+        await loadUpcomingTab();
+      }
 
-      const ongoingList = allOngoing.filter(  
-        t => t.status === 'ongoing'  
-      );  
+    });
 
-      if(ongoingList.length === 0){  
+  });
 
-        $('#list').innerHTML = `  
-          <div class="empty">  
-            <div class="empty-icon">🔴</div>  
-            <div class="empty-title">No ongoing tournaments</div>  
-            <div class="empty-text">  
-              Abhi koi match live nahi hai.  
-            </div>  
-          </div>  
-        `;  
+}
 
-        return;  
+/* ============================================================  
+   LOAD UPCOMING TAB  
+   ============================================================ */  
 
-      }  
+async function loadUpcomingTab(){
 
-      $('#list').innerHTML =  
-        ongoingList.map(ongoingTournamentCard).join('');  
+  const list = $('#list');
+  if(!list) return;
 
-      /* View buttons attach karo */  
+  list.innerHTML = `
+    <div class="empty">
+      <div class="empty-icon">⏳</div>
+      <div class="empty-title">Loading upcoming...</div>
+    </div>
+  `;
 
-      $$('[data-view-id]').forEach(btn => {  
-        btn.onclick = () => {  
-          openTournamentDetail(btn.dataset.viewId);  
-        };  
-      });  
+  const tournaments = await getOnlineTournaments(selectedCategory);
 
-      return;  
+  const upcomingOnly = tournaments.filter(t => t.status === 'upcoming');
 
-    }  
+  if(upcomingOnly.length === 0){
+    list.innerHTML = `
+      <div class="empty">
+        <div class="empty-icon">📅</div>
+        <div class="empty-title">No upcoming tournaments</div>
+        <div class="empty-text">Abhi koi upcoming match nahi hai.</div>
+      </div>
+    `;
+    return;
+  }
 
-    /* ===== RESULT ===== */  
+  list.innerHTML = upcomingOnly.map(tournamentCard).join('');
+  attachJoinButtons();
 
-if(tabName === 'result'){  
+}
 
-  $('#list').innerHTML = `  
-    <div class="empty">  
-      <div class="empty-icon">⏳</div>  
-      <div class="empty-title">Loading results...</div>  
-    </div>  
-  `;  
+/* ============================================================  
+   LOAD ONGOING TAB  
+   ============================================================ */  
 
-  const allResults = await getOnlineTournaments(selectedCategory);  
+async function loadOngoingTab(){
 
-  const resultList = allResults.filter(  
-    t => t.status === 'result'  
-  );  
+  const list = $('#list');
+  if(!list) return;
 
-  if(resultList.length === 0){  
+  list.innerHTML = `
+    <div class="empty">
+      <div class="empty-icon">⏳</div>
+      <div class="empty-title">Loading ongoing...</div>
+    </div>
+  `;
 
-    $('#list').innerHTML = `  
-      <div class="empty">  
-        <div class="empty-icon">🏆</div>  
-        <div class="empty-title">No results yet</div>  
-        <div class="empty-text">  
-          Abhi koi tournament complete nahi hua.  
-        </div>  
-      </div>  
-    `;  
+  const all = await getOnlineTournaments(selectedCategory);
 
-    return;  
+  const ongoingList = all.filter(t => t.status === 'ongoing');
 
-  }  
+  if(ongoingList.length === 0){
+    list.innerHTML = `
+      <div class="empty">
+        <div class="empty-icon">🔴</div>
+        <div class="empty-title">No ongoing tournaments</div>
+        <div class="empty-text">Abhi koi match live nahi hai.</div>
+      </div>
+    `;
+    return;
+  }
 
-  $('#list').innerHTML =  
-    resultList.map(resultTournamentCard).join('');  
+  list.innerHTML = ongoingList.map(ongoingTournamentCard).join('');
 
-  /* View Result buttons attach karo */  
+  $$('[data-view-id]').forEach(btn => {
+    btn.onclick = () => openTournamentDetail(btn.dataset.viewId);
+  });
 
-  $$('[data-result-view-id]').forEach(btn => {  
+}
 
-    btn.onclick = () => {  
-      openResultDetail(btn.dataset.resultViewId);  
-    };  
+/* ============================================================  
+   LOAD RESULT TAB  
+   ============================================================ */  
 
-  });  
+async function loadResultTab(){
 
-  return;  
-}  
+  const list = $('#list');
+  if(!list) return;
 
-    /* ===== UPCOMING ===== */  
+  list.innerHTML = `
+    <div class="empty">
+      <div class="empty-icon">⏳</div>
+      <div class="empty-title">Loading results...</div>
+    </div>
+  `;
 
-    renderTournaments(selectedCategory);  
+  const all = await getOnlineTournaments(selectedCategory);
 
-  };  
+  const resultList = all.filter(t => t.status === 'result');
 
-});  
+  if(resultList.length === 0){
+    list.innerHTML = `
+      <div class="empty">
+        <div class="empty-icon">🏆</div>
+        <div class="empty-title">No results yet</div>
+        <div class="empty-text">Abhi koi tournament complete nahi hua.</div>
+      </div>
+    `;
+    return;
+  }
 
-  return;  
+  list.innerHTML = resultList.map(resultTournamentCard).join('');
 
-}  
+  $$('[data-result-view-id]').forEach(btn => {
+    btn.onclick = () => openResultDetail(btn.dataset.resultViewId);
+  });
 
-list.innerHTML =  
-  upcomingOnly  
-    .map(tournamentCard)  
-    .join('');  
+}
 
-attachJoinButtons();  
-  
-/* ===== TABS EVENT BINDING ===== */  
+/* ============================================================  
+   RENDER TOURNAMENTS (MAIN FUNCTION)  
+   ============================================================ */  
 
-$$('.t-tab').forEach(tab => {  
+async function renderTournaments(category = null){
 
-  tab.onclick = async () => {  
+  selectedCategory = category || null;
 
-    const tabName = tab.dataset.tTab;  
+  const heading = $('#tournamentHeading');
+  const banner = $('#categoryBanner');
 
-    $$('.t-tab').forEach(t => {  
+  /* ===== HEADING + BANNER ===== */
 
-      t.classList.toggle('active', t.dataset.tTab === tabName);  
+  if(category){
 
-    });  
+    const label = categoryLabel(category);
 
-    /* ===== ONGOING (baad me banayenge) ===== */  
+    if(heading){
+      heading.textContent = label + ' Tournaments';
+    }
 
- if(tabName === 'ongoing'){  
+    if(banner){
+      banner.classList.remove('hidden');
+      banner.innerHTML = `
+        <strong>🎮 ${escapeHtml(label)}</strong>
+      `;
+    }
 
-  $('#list').innerHTML = `  
-    <div class="empty">  
-      <div class="empty-icon">⏳</div>  
-      <div class="empty-title">Loading ongoing...</div>  
-    </div>  
-  `;  
+  } else {
 
-  const allOngoing = await getOnlineTournaments(selectedCategory);  
+    if(heading){
+      heading.textContent = 'All Tournaments';
+    }
 
-  const ongoingList = allOngoing.filter(  
-    t => t.status === 'ongoing'  
-  );  
+    if(banner){
+      banner.classList.add('hidden');
+      banner.innerHTML = '';
+    }
 
-  if(ongoingList.length === 0){  
+  }
 
-    $('#list').innerHTML = `  
-      <div class="empty">  
-        <div class="empty-icon">🔴</div>  
-        <div class="empty-title">No ongoing tournaments</div>  
-        <div class="empty-text">  
-          Abhi koi match live nahi hai.  
-        </div>  
-      </div>  
-    `;  
+  /* ===== RESET TABS TO UPCOMING ===== */
 
-    return;  
+  $$('.t-tab').forEach(t => {
+    t.classList.toggle('active', t.dataset.tTab === 'upcoming');
+  });
 
-  }  
+  /* ===== LOAD UPCOMING TAB ===== */
 
-  $('#list').innerHTML =  
-    ongoingList.map(ongoingTournamentCard).join('');  
+  await loadUpcomingTab();
 
-  /* View buttons attach karo */  
+  }
 
-  $$('[data-view-id]').forEach(btn => {  
-    btn.addEventListener('click', () => {  
-      openTournamentDetail(btn.dataset.viewId);  
-    });  
-  });  
 
-  return;  
-}  
 
-    /* ===== RESULT (baad me banayenge) ===== */  
-
-    if(tabName === 'result'){  
-
-      $('#list').innerHTML = `  
-        <div class="empty">  
-          <div class="empty-icon">🏆</div>  
-          <div class="empty-title">Results</div>  
-          <div class="empty-text">  
-            Result page abhi ban raha hai.  
-          </div>  
-        </div>  
-      `;  
-
-      return;  
-    }  
-
-    /* ===== UPCOMING ===== */  
-
-    renderTournaments(selectedCategory);  
-
-  };  
-
-});  
-
-}  
   
     
   
@@ -12871,9 +12748,12 @@ async function init(){
   
   await loadSettings();  
   
-  populateCategorySelect();  
+    populateCategorySelect();  
 
 renderGames();  
+
+/* Setup tournament tabs (ek baar) */
+setupTournamentTabs();
 
 /* Setup payments toggle */
 setTimeout(() => {
