@@ -1981,7 +1981,126 @@
 .wd-status.pending{background:rgba(245,158,11,.16);color:#fbbf24;border:1px solid rgba(245,158,11,.3);}
 .wd-status.approved{background:rgba(34,197,94,.16);color:#6ee7a0;border:1px solid rgba(34,197,94,.3);}
 .wd-status.rejected{background:rgba(239,68,68,.16);color:#ff8b8b;border:1px solid rgba(239,68,68,.3);}
-  
+
+/* ================= LOADING SPINNER ================= */
+
+.hkr-loading-overlay{
+  position:fixed;
+  inset:0;
+  z-index:99998;
+  background:rgba(7,7,17,.75);
+  backdrop-filter:blur(6px);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+  gap:18px;
+}
+
+.hkr-loading-overlay.show{
+  display:flex;
+}
+
+.hkr-spinner{
+  width:64px;
+  height:64px;
+  border-radius:50%;
+  border:4px solid rgba(139,61,255,.18);
+  border-top-color:#8b3dff;
+  border-right-color:#c93fff;
+  animation:hkrSpin .8s linear infinite;
+  box-shadow:0 0 25px rgba(139,61,255,.4);
+}
+
+@keyframes hkrSpin{
+  to{ transform:rotate(360deg); }
+}
+
+.hkr-loading-text{
+  font-size:13px;
+  font-weight:900;
+  color:#c98cff;
+  letter-spacing:1.2px;
+  animation:hkrPulse 1.4s ease-in-out infinite;
+}
+
+@keyframes hkrPulse{
+  0%,100%{ opacity:.5; }
+  50%{ opacity:1; }
+}
+
+/* ================= NOTIFICATION BELL BADGE ================= */
+
+.icon-btn{
+  position:relative;
+}
+
+.notif-badge{
+  position:absolute;
+  top:2px;
+  right:2px;
+  width:10px;
+  height:10px;
+  border-radius:50%;
+  background:#ff2d75;
+  box-shadow:0 0 8px rgba(255,45,117,.9), 0 0 4px rgba(255,45,117,1);
+  border:2px solid #070711;
+  animation:notifPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes notifPulse{
+  0%, 100%{ transform:scale(1); opacity:1; }
+  50%{ transform:scale(1.15); opacity:.85; }
+    }
+
+/* ================= NOTIFICATION PAGE ================= */
+
+.notif-item{
+  padding:14px;
+  border-radius:14px;
+  background:linear-gradient(145deg,rgba(124,58,237,.10),rgba(59,130,246,.04));
+  border:1px solid rgba(124,58,237,.22);
+  margin-bottom:10px;
+  position:relative;
+}
+
+.notif-item::before{
+  content:"";
+  position:absolute;
+  left:0;
+  top:14px;
+  bottom:14px;
+  width:3px;
+  border-radius:4px;
+  background:linear-gradient(180deg,#8b3dff,#c93fff);
+}
+
+.notif-item-title{
+  font-size:14px;
+  font-weight:1000;
+  color:#fff;
+  margin-bottom:5px;
+  padding-left:10px;
+  word-break:break-word;
+}
+
+.notif-item-msg{
+  font-size:12px;
+  color:#d8d3e2;
+  line-height:1.6;
+  font-weight:600;
+  padding-left:10px;
+  word-break:break-word;
+}
+
+.notif-item-date{
+  font-size:10px;
+  color:#a49ead;
+  font-weight:700;
+  margin-top:8px;
+  padding-left:10px;
+}
+    
   /* ================= PROFILE MENU ================= */
 
 .profile-menu{
@@ -2689,6 +2808,23 @@
 
 </section>  
 
+<!-- ================= NOTIFICATIONS PAGE ================= -->
+
+<section id="notificationsPage" class="page">
+
+  <div class="td-header">
+    <button class="td-back-btn" id="notifBackBtn" type="button">←</button>
+    <div class="td-header-info">
+      <div class="td-header-title">Notifications</div>
+      <div class="td-header-sub" id="notifSubTitle">All updates from HKR</div>
+    </div>
+  </div>
+
+  <div id="notifContent"></div>
+
+</section>
+
+    
 <!-- ================= PROFILE CONTENT PAGE ================= -->
 
 <section id="profileContentPage" class="page">
@@ -2705,7 +2841,7 @@
 
 </section>
 
-<!-- ================= TOURNAMENTS ================= -->
+
 <!-- ================= TOURNAMENTS ================= -->  
 
 <section id="tournaments" class="page">  
@@ -2932,6 +3068,14 @@ type="button"
   🥇 RESULTS
 </button>
 
+<button
+  class="admin-tab"
+  data-admin-tab="notifications"
+  type="button"
+>
+  🔔 NOTIFICATIONS
+</button>
+  
  <button
 class="admin-tab"
 data-admin-tab="settings"
@@ -3553,6 +3697,56 @@ type="button"
   </div>  
 
 </div>  
+ <!-- =========================================================  
+     ADMIN NOTIFICATIONS  
+     ========================================================= -->
+
+<div  
+  id="adminNotificationsTab"  
+  class="admin-tab-content hidden"  
+>  
+
+  <div class="admin-form">  
+
+    <h3 style="margin-top:0">  
+      🔔 Notifications Management  
+    </h3>  
+
+    <div class="muted" style="margin-bottom:15px">  
+      Yahan se notification add karein — sabhi users ko dikhega.  
+    </div>  
+
+    <div class="field">  
+      <label>NOTIFICATION TITLE</label>  
+      <input  
+        id="adminNotifTitle"  
+        type="text"  
+        placeholder="Example: New Tournament Added!"  
+      >  
+    </div>  
+
+    <div class="field">  
+      <label>MESSAGE</label>  
+      <textarea  
+        id="adminNotifMessage"  
+        rows="4"  
+        placeholder="Type your notification message here..."  
+      ></textarea>  
+    </div>  
+
+    <button  
+      class="btn"  
+      id="saveNotificationBtn"  
+      type="button"  
+    >  
+      📤 SEND NOTIFICATION  
+    </button>  
+
+    <div class="admin-list" id="adminNotificationsList"></div>  
+
+  </div>  
+
+</div>
 
       <div  
       
@@ -3669,7 +3863,13 @@ type="button"
 
 </section>
 
-  </main>    <!-- ================= BOTTOM NAV ================= -->    <nav class="bottom-nav">  <button  
+  </main>  
+  <!-- ================= GLOBAL LOADING OVERLAY ================= -->
+
+<div id="hkrLoadingOverlay" class="hkr-loading-overlay">
+  <div class="hkr-spinner"></div>
+</div>
+  <!-- ================= BOTTOM NAV ================= -->    <nav class="bottom-nav">  <button  
   class="nav-btn active"  
   data-page="home"  
   type="button"  
@@ -7718,7 +7918,11 @@ $('#adminResultsTab')
     'hidden',  
     selected !== 'results'  
   );  
-  
+  $('#adminNotificationsTab')  
+  ?.classList.toggle(  
+    'hidden',  
+    selected !== 'notifications'  
+  );  
       if(selected === 'tournaments'){  
   
         await renderAdminTournamentList();  
@@ -7746,7 +7950,12 @@ $('#adminResultsTab')
         applySettings();  
   
       }  
-  
+  if(selected === 'notifications'){  
+
+  await loadAdminNotifications();  
+
+}  
+
 if(selected === 'results'){  
 
   await loadResultsTournaments();  
@@ -10275,16 +10484,19 @@ async function loadUser(){
 
     }
 
-    await checkAdmin();
+      await checkAdmin();
 
-  }catch(err){
-    console.error('User load error:', err);
-    showAuthScreen();
+  /* Update notification badge */
+  setTimeout(() => {
+    updateNotificationBadge();
+  }, 800);
+
+}catch(err){
+  console.error('User load error:', err);
+  showAuthScreen();
   }
-
-}
   
-  
+  }
     
   
   
@@ -10341,13 +10553,13 @@ function setupAuthListener(){
 /* ============================================================  
    NOTIFICATION  
    ============================================================ */  
-  
-$('#notifyBtn')?.addEventListener(  
+  $('#notifyBtn')?.addEventListener(  
   'click',  
   () => { 
-    toast('No new notifications');  
+    openNotificationsPage();  
   }  
 );  
+
 /* ============================================================  
    WALLET  
    ============================================================ */  
@@ -12737,6 +12949,376 @@ $('#forgotPasswordBtn')?.addEventListener('click', async () => {
 
 });
 
+/* ============================================================  
+   GLOBAL LOADING SYSTEM  
+   ============================================================ */  
+
+let _loadingCount = 0;
+
+function showLoading(){  
+  _loadingCount++;  
+  const el = document.getElementById('hkrLoadingOverlay');  
+  if(el) el.classList.add('show');  
+}  
+
+function hideLoading(){  
+  _loadingCount = Math.max(0, _loadingCount - 1);  
+  if(_loadingCount === 0){  
+    const el = document.getElementById('hkrLoadingOverlay');  
+    if(el) el.classList.remove('show');  
+  }  
+}  
+
+/* ============================================================  
+   NOTIFICATIONS SYSTEM  
+   ============================================================ */  
+
+let notificationsList = [];  
+
+/* ===== GET NOTIFICATIONS ===== */  
+
+async function getNotifications(){  
+
+  if(!sb) return [];  
+
+  try{  
+
+    const { data, error } = await sb  
+      .from('notifications')  
+      .select('id, title, message, created_at')  
+      .eq('is_active', true)  
+      .order('created_at', { ascending: false })  
+      .limit(50);  
+
+    if(error){  
+      console.error('Notifications load error:', error);  
+      return [];  
+    }  
+
+    return data || [];  
+
+  }catch(err){  
+    console.error('Notifications error:', err);  
+    return [];  
+  }  
+
+}  
+
+/* ===== GET LAST SEEN TIME ===== */  
+
+function getLastSeenNotifTime(){  
+  try{  
+    return localStorage.getItem('HKR_LAST_SEEN_NOTIF') || '0';  
+  }catch(e){  
+    return '0';  
+  }  
+}  
+
+function setLastSeenNotifTime(time){  
+  try{  
+    localStorage.setItem('HKR_LAST_SEEN_NOTIF', time);  
+  }catch(e){}  
+}  
+
+/* ===== UPDATE BELL BADGE ===== */  
+
+async function updateNotificationBadge(){  
+
+  const bellBtn = $('#notifyBtn');  
+  if(!bellBtn) return;  
+
+  /* Remove old badge */  
+  bellBtn.querySelector('.notif-badge')?.remove();  
+
+  if(!sb || !currentUser) return;  
+
+  const notifications = await getNotifications();  
+
+  if(notifications.length === 0) return;  
+
+  const lastSeen = getLastSeenNotifTime();  
+
+  const unreadCount = notifications.filter(n => {  
+    return new Date(n.created_at).getTime() > Number(lastSeen || 0);  
+  }).length;  
+
+  if(unreadCount > 0){  
+    const badge = document.createElement('span');  
+    badge.className = 'notif-badge';  
+     
+    bellBtn.appendChild(badge);  
+  }  
+
+}  
+
+/* ===== OPEN NOTIFICATIONS PAGE ===== */  
+
+async function openNotificationsPage(){  
+
+  if(!currentUser){  
+    toast('Pehle login karo');  
+    return;  
+  }  
+
+  const content = $('#notifContent');  
+  if(!content) return;  
+
+  content.innerHTML = `  
+    <div class="empty">  
+      <div class="empty-icon">⏳</div>  
+      <div class="empty-title">Loading notifications...</div>  
+    </div>  
+  `;  
+
+  show('notificationsPage');  
+
+  $('#notifBackBtn').onclick = () => show('home');  
+
+  try{  
+
+    const notifications = await getNotifications();  
+
+    /* Mark all as seen */  
+    if(notifications.length > 0){  
+      setLastSeenNotifTime(String(Date.now()));  
+      updateNotificationBadge();  
+    }  
+
+    if(notifications.length === 0){  
+
+      content.innerHTML = `  
+        <div class="empty">  
+          <div class="empty-icon">🔔</div>  
+          <div class="empty-title">No notifications</div>  
+          <div class="empty-text">Abhi koi notification nahi hai. Updates ke liye check karte raho.</div>  
+        </div>  
+      `;  
+
+      return;  
+    }  
+
+    content.innerHTML = notifications.map(n => {  
+
+      const dateText = n.created_at  
+        ? new Date(n.created_at).toLocaleString('en-IN', {  
+            day:'2-digit', month:'short', year:'numeric',  
+            hour:'2-digit', minute:'2-digit'  
+          })  
+        : '';  
+
+      return `  
+        <div class="notif-item">  
+          <div class="notif-item-title">${escapeHtml(n.title || 'Notification')}</div>  
+          <div class="notif-item-msg">${escapeHtml(n.message || '')}</div>  
+          ${dateText ? `<div class="notif-item-date">🕐 ${escapeHtml(dateText)}</div>` : ''}  
+        </div>  
+      `;  
+
+    }).join('');  
+
+  }catch(err){  
+
+    console.error('OPEN NOTIFICATIONS ERROR:', err);  
+
+    content.innerHTML = `  
+      <div class="empty">  
+        <div class="empty-icon">⚠️</div>  
+        <div class="empty-title">Notifications unavailable</div>  
+        <div class="empty-text">${escapeHtml(err?.message || 'Unknown error')}</div>  
+      </div>  
+    `;  
+
+  }  
+
+}  
+
+/* ===== ADMIN: LOAD NOTIFICATIONS LIST ===== */  
+
+async function loadAdminNotifications(){  
+
+  const wrap = $('#adminNotificationsList');  
+  if(!wrap) return;  
+
+  if(!sb) return;  
+
+  wrap.innerHTML = `  
+    <div class="empty">  
+      <div class="empty-icon">⏳</div>  
+      <div class="empty-title">Loading...</div>  
+    </div>  
+  `;  
+
+  try{  
+
+    const { data, error } = await sb  
+      .from('notifications')  
+      .select('*')  
+      .order('created_at', { ascending: false })  
+      .limit(50);  
+
+    if(error) throw error;  
+
+    if(!data || data.length === 0){  
+
+      wrap.innerHTML = `  
+        <div class="empty">  
+          <div class="empty-icon">🔔</div>  
+          <div class="empty-title">No notifications yet</div>  
+        </div>  
+      `;  
+
+      return;  
+    }  
+
+    wrap.innerHTML = data.map(n => {  
+
+      const dateText = n.created_at  
+        ? new Date(n.created_at).toLocaleString('en-IN', {  
+            day:'2-digit', month:'short',  
+            hour:'2-digit', minute:'2-digit'  
+          })  
+        : '';  
+
+      return `  
+        <div class="admin-item">  
+          <div class="admin-item-title">${escapeHtml(n.title || '')}</div>  
+          <div class="admin-item-meta">${escapeHtml(n.message || '')}</div>  
+          <div class="admin-item-meta" style="margin-top:8px">🕐 ${escapeHtml(dateText)}</div>  
+          <div class="admin-item-actions">  
+            <button  
+              class="small-btn admin-danger"  
+              type="button"  
+              data-notif-delete-id="${escapeHtml(n.id)}"  
+            >  
+              🗑️ DELETE  
+            </button>  
+          </div>  
+        </div>  
+      `;  
+
+    }).join('');  
+
+    /* DELETE HANDLERS */  
+
+    wrap.querySelectorAll('[data-notif-delete-id]').forEach(btn => {  
+
+      btn.addEventListener('click', async () => {  
+
+        const id = btn.dataset.notifDeleteId;  
+        if(!id) return;  
+
+        if(!confirm('Ye notification delete karni hai?')) return;  
+
+        try{  
+
+          const { error } = await sb  
+            .from('notifications')  
+            .delete()  
+            .eq('id', id);  
+
+          if(error) throw error;  
+
+          toast('Notification deleted');  
+          await loadAdminNotifications();  
+
+        }catch(err){  
+          console.error('DELETE NOTIF ERROR:', err);  
+          toast('Delete failed');  
+        }  
+
+      });  
+
+    });  
+
+  }catch(err){  
+
+    console.error('LOAD ADMIN NOTIF ERROR:', err);  
+
+    wrap.innerHTML = `  
+      <div class="empty">  
+        <div class="empty-icon">⚠️</div>  
+        <div class="empty-title">Unavailable</div>  
+        <div class="empty-text">${escapeHtml(err?.message || 'Unknown error')}</div>  
+      </div>  
+    `;  
+
+  }  
+
+}  
+
+/* ===== ADMIN: SAVE NOTIFICATION ===== */  
+
+$('#saveNotificationBtn')?.addEventListener('click', async () => {  
+
+  const btn = $('#saveNotificationBtn');  
+  const titleEl = $('#adminNotifTitle');  
+  const msgEl = $('#adminNotifMessage');  
+
+  const title = (titleEl?.value || '').trim();  
+  const message = (msgEl?.value || '').trim();  
+
+  if(!title){  
+    toast('Title daalo');  
+    titleEl?.focus();  
+    return;  
+  }  
+
+  if(!message){  
+    toast('Message daalo');  
+    msgEl?.focus();  
+    return;  
+  }  
+
+  if(!sb){  
+    toast('Database connected nahi hai');  
+    return;  
+  }  
+
+  const isAdmin = await checkAdmin();  
+  if(!isAdmin){  
+    toast('Admin access denied');  
+    return;  
+  }  
+
+  if(btn){  
+    btn.disabled = true;  
+    btn.textContent = '⏳ Sending...';  
+  }  
+
+  try{  
+
+    const { error } = await sb  
+      .from('notifications')  
+      .insert({  
+        title: title,  
+        message: message,  
+        is_active: true  
+      });  
+
+    if(error) throw error;  
+
+    toast('Notification sent! 🎉');  
+
+    if(titleEl) titleEl.value = '';  
+    if(msgEl) msgEl.value = '';  
+
+    await loadAdminNotifications();  
+
+  }catch(err){  
+
+    console.error('SAVE NOTIF ERROR:', err);  
+    toast('Send failed: ' + (err.message || 'Unknown'));  
+
+  }finally{  
+
+    if(btn){  
+      btn.disabled = false;  
+      btn.textContent = '📤 SEND NOTIFICATION';  
+    }  
+
+  }  
+
+});  
 
 /* ============================================================  
    INITIALIZATION  
@@ -12759,7 +13341,17 @@ setupTournamentTabs();
 setTimeout(() => {
   setupPaymentsToggle();
 }, 500);
-  
+  /* Notification badge update */
+setTimeout(() => {
+  updateNotificationBadge();
+}, 1000);
+
+/* Check for new notifications every 60 seconds */
+setInterval(() => {
+  if(currentUser){
+    updateNotificationBadge();
+  }
+}, 60000);
   if(sb){  
   
     setupAuthListener();  
