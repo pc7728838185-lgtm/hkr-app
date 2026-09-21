@@ -1987,7 +1987,7 @@
 .hkr-loading-overlay{
   position:fixed;
   inset:0;
-  z-index:99998;
+  z-index:100000;
   background:rgba(7,7,17,.75);
   backdrop-filter:blur(6px);
   display:none;
@@ -2001,15 +2001,40 @@
   display:flex;
 }
 
-.hkr-spinner{
+.hkr-spinner-wrap{
+  position:relative;
   width:64px;
   height:64px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.hkr-spinner{
+  position:absolute;
+  inset:0;
   border-radius:50%;
   border:4px solid rgba(139,61,255,.18);
   border-top-color:#8b3dff;
   border-right-color:#c93fff;
   animation:hkrSpin .8s linear infinite;
   box-shadow:0 0 25px rgba(139,61,255,.4);
+}
+
+.hkr-spinner-text{
+  position:relative;
+  z-index:2;
+  font-size:10px;
+  font-weight:1000;
+  color:#c98cff;
+  letter-spacing:.5px;
+  text-transform:lowercase;
+  animation:hkrPulse 1.4s ease-in-out infinite;
+}
+
+@keyframes hkrPulse{
+  0%,100%{ opacity:.5; }
+  50%{ opacity:1; }
 }
 
 @keyframes hkrSpin{
@@ -3866,8 +3891,11 @@ type="button"
   </main>  
   <!-- ================= GLOBAL LOADING OVERLAY ================= -->
 
-<div id="hkrLoadingOverlay" class="hkr-loading-overlay">
-  <div class="hkr-spinner"></div>
+<div id="hkrLoadingOverlay" class="hkr-loading-overlay show">
+  <div class="hkr-spinner-wrap">
+    <div class="hkr-spinner"></div>
+    <div class="hkr-spinner-text">wait...</div>
+  </div>
 </div>
   <!-- ================= BOTTOM NAV ================= -->    <nav class="bottom-nav">  <button  
   class="nav-btn active"  
@@ -13366,7 +13394,12 @@ setInterval(() => {
   
   }  
   
-  await renderHomeTournaments();  
+    await renderHomeTournaments();  
+
+  /* ===== HIDE LOADING OVERLAY ===== */
+  setTimeout(() => {
+    document.getElementById('hkrLoadingOverlay')?.classList.remove('show');
+  }, 300);
   
   /*  
     Service worker  
