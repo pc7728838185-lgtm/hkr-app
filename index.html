@@ -1511,6 +1511,7 @@
    ============================================================ */
 
 #authScreen{
+  display:none;
   position:fixed;
   inset:0;
   z-index:99999;
@@ -5457,7 +5458,7 @@ ${
 
     $('#tdBackBtn').onclick = () => {  
       show('tournaments');  
-      renderTournaments(selectedCategory);  
+       
     };  
 
     /* ===== JOIN BUTTON ===== */  
@@ -5566,7 +5567,7 @@ async function openResultDetail(id){
 
     $('#rdBackBtn').onclick = () => {  
       show('tournaments');  
-      renderTournaments(selectedCategory);  
+       
     };  
 
     /* ===== RESULTS FETCH ===== */  
@@ -7061,7 +7062,7 @@ $('#viewAll').addEventListener(
   
     show('tournaments');  
   
-    renderTournaments(null);  
+     
   
   }  
 );  
@@ -7073,7 +7074,7 @@ $('#allTournamentBtn').addEventListener(
   
     selectedCategory = null;  
   
-    renderTournaments(null);  
+     show('tournaments');
   
   }  
 );  
