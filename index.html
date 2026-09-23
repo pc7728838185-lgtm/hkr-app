@@ -13530,9 +13530,16 @@ async function loadUser(){
 setTimeout(() => {
   renderProfileBadgesChips(user.id);
 }, 500);
-/* ═══ Custom notification popup on login ═══ */
-setTimeout(() => {
-  showNotifPermissionPopup();
+/
+      /* ═══ Push subscription on login ═══ */
+setTimeout(async () => {
+  if('Notification' in window && Notification.permission === 'granted'){
+    /* Permission already granted → directly subscribe karo */
+    await setupPushNotifications();
+  } else {
+    /* Permission nahi hai → popup dikhao */
+    showNotifPermissionPopup();
+  }
 }, 2500);
 
 
