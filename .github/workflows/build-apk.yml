@@ -2,8 +2,8 @@ name: Build APK
 
 on:
   push:
-    branches: [ main ] # Ya jo bhi tera main branch hai
-  workflow_dispatch: # Isse tu manually bhi build trigger kar sakta hai
+    branches: [ main ]
+  workflow_dispatch:
 
 jobs:
   build:
@@ -17,22 +17,22 @@ jobs:
         with:
           node-version: '18'
 
-      - name: Install Dependencies
-        run: |
-          npm init -y
-          npm install @capacitor/core @capacitor/cli @capacitor/android
-
-      - name: Initialize Capacitor
-        run: |
-          npx cap init "HKR Tournaments" "com.hkr.tournaments" --web-dir=.
-          npx cap add android
-          npx cap sync
-
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
+
+      - name: Install Capacitor
+        run: |
+          npm init -y
+          npm install @capacitor/core @capacitor/cli @capacitor/android
+
+      - name: Initialize Android
+        run: |
+          npx cap init "HKR App" "com.hkr.app" --web-dir=.
+          npx cap add android
+          npx cap sync
 
       - name: Build APK
         run: |
