@@ -17774,33 +17774,38 @@ document.addEventListener('touchmove', function(e){
   }
 }, { passive: false });
 
-  /* ===== ENABLE PUSH NOTIFICATION BUTTON LOGIC ===== */
+/* ===== ENABLE PUSH NOTIFICATION BUTTON LOGIC ===== */
 
 // Check karo agar permission nahi hai toh button dikhao
 window.addEventListener('load', () => {
     setTimeout(() => {
         const btn = document.getElementById('enablePushBtn');
         if(btn && window.Notification) {
+            // Agar permission pehle se 'granted' (allow) nahi hai, tabhi button dikhao
             if (Notification.permission !== 'granted') {
                 btn.style.display = 'block';
             }
         }
-    }, 3000); 
+    }, 3000); // 3 second baad check karega
 });
 
 // Button dabane par notification maango
 document.getElementById('enablePushBtn')?.addEventListener('click', async function() {
     try {
         if (window.OneSignal && OneSignal.Notifications) {
+            // OneSignal se permission maango
             await OneSignal.Notifications.requestPermission();
         } else {
+            // Fallback
             await Notification.requestPermission();
         }
 
-        // Agar user ne Allow kar diya toh button chhupa do
+        // Agar user ne allow kar diya toh button chhupa do
         if (Notification.permission === 'granted') {
             this.style.display = 'none';
             alert('Notification Alerts ON ho gaye! 🎉');
+        } else {
+            alert('Aapne notification block kar diya hai. Phone settings se allow karein.');
         }
     } catch (e) {
         alert('Error: ' + e.message);
