@@ -42,7 +42,10 @@ jobs:
 
       - name: Add Android platform
         run: npx cap add android
-
+        
+      - name: Copy Firebase File
+        run: cp google-services.json android/app/google-services.json
+     
       - name: Sync Android
         run: npx cap sync android
 
