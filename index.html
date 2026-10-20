@@ -8,19 +8,14 @@
   <link rel="manifest" href="manifest.json">  
   <title>HKR Tournaments</title>  
 
-<!-- OneSignal Push Notifications -->
+  <!-- OneSignal Android Push Notifications -->
 <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
 <script>
   window.OneSignalDeferred = window.OneSignalDeferred || [];
   OneSignalDeferred.push(async function(OneSignal) {
     await OneSignal.init({
-      appId: "29a4b3a5-90e8-498e-bcc9-c2e7578d9bcc",
-      serviceWorkerPath: "/hkr-app/OneSignalSDKWorker.js",
-      serviceWorkerParam: { scope: "/hkr-app/" }
+      appId: "29a4b3a5-90e8-498e-bcc9-c2e7578d9bcc"
     });
-    
-    // Optional: Jab user allow kare toh use pata chale
-    OneSignal.Debug.setLogLevel('trace'); 
   });
 </script>
 
@@ -17774,43 +17769,7 @@ document.addEventListener('touchmove', function(e){
   }
 }, { passive: false });
 
-/* ===== ENABLE PUSH NOTIFICATION BUTTON LOGIC ===== */
 
-// Check karo agar permission nahi hai toh button dikhao
-window.addEventListener('load', () => {
-    setTimeout(() => {
-        const btn = document.getElementById('enablePushBtn');
-        if(btn && window.Notification) {
-            // Agar permission pehle se 'granted' (allow) nahi hai, tabhi button dikhao
-            if (Notification.permission !== 'granted') {
-                btn.style.display = 'block';
-            }
-        }
-    }, 3000); // 3 second baad check karega
-});
-
-// Button dabane par notification maango
-document.getElementById('enablePushBtn')?.addEventListener('click', async function() {
-    try {
-        if (window.OneSignal && OneSignal.Notifications) {
-            // OneSignal se permission maango
-            await OneSignal.Notifications.requestPermission();
-        } else {
-            // Fallback
-            await Notification.requestPermission();
-        }
-
-        // Agar user ne allow kar diya toh button chhupa do
-        if (Notification.permission === 'granted') {
-            this.style.display = 'none';
-            alert('Notification Alerts ON ho gaye! 🎉');
-        } else {
-            alert('Aapne notification block kar diya hai. Phone settings se allow karein.');
-        }
-    } catch (e) {
-        alert('Error: ' + e.message);
-    }
-});
   
 </script>  
 
