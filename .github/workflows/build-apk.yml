@@ -1,9 +1,7 @@
 name: Build APK
 
 on:
-  push:
-    branches: [ main ]
-  workflow_dispatch:
+  workflow_dispatch: 
 
 jobs:
   build:
@@ -15,22 +13,22 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20' # Naya version
+          node-version: '20'
 
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: 'zulu'
-          java-version: '21' # Naya version
+          java-version: '21'
 
       - name: Install Capacitor
         run: |
           npm init -y
           npm install @capacitor/core @capacitor/cli @capacitor/android
 
-      - name: Initialize Android
+      - name: Create Android Project
         run: |
-          npx cap init "HKR Tournaments" "com.hkr.app" --web-dir=.
+          npx cap init "HKR App" "com.hkr.app" --web-dir=.
           npx cap add android
           npx cap sync
 
