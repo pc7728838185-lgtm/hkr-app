@@ -5039,6 +5039,10 @@ button:active {
     type="button"  
   >🔔</button>  
 
+  <button id="enablePushBtn" style="display:none; background:#ff2d75; color:white; border:none; padding:6px 10px; border-radius:8px; font-size:12px; font-weight:bold; margin-right:5px;">
+  🔔 Enable Alerts
+  </button>
+  
   <button  
     id="adminNav"  
     class="admin-top-btn hidden"  
@@ -17769,6 +17773,40 @@ document.addEventListener('touchmove', function(e){
     e.preventDefault();
   }
 }, { passive: false });
+
+  /* ===== ENABLE PUSH NOTIFICATION BUTTON LOGIC ===== */
+
+// Check karo agar permission nahi hai toh button dikhao
+window.addEventListener('load', () => {
+    setTimeout(() => {
+        const btn = document.getElementById('enablePushBtn');
+        if(btn && window.Notification) {
+            if (Notification.permission !== 'granted') {
+                btn.style.display = 'block';
+            }
+        }
+    }, 3000); 
+});
+
+// Button dabane par notification maango
+document.getElementById('enablePushBtn')?.addEventListener('click', async function() {
+    try {
+        if (window.OneSignal && OneSignal.Notifications) {
+            await OneSignal.Notifications.requestPermission();
+        } else {
+            await Notification.requestPermission();
+        }
+
+        // Agar user ne Allow kar diya toh button chhupa do
+        if (Notification.permission === 'granted') {
+            this.style.display = 'none';
+            alert('Notification Alerts ON ho gaye! 🎉');
+        }
+    } catch (e) {
+        alert('Error: ' + e.message);
+    }
+});
+  
 </script>  
 
 </body>  
