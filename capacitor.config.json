@@ -1,5 +1,6 @@
 {
   "appId": "com.hkr.app",
   "appName": "HKR App",
-  "webDir": "."
+  "webDir": "www"
 }
+l
