@@ -17769,7 +17769,19 @@ document.addEventListener('touchmove', function(e){
   }
 }, { passive: false });
 
-
+/* ═══ ONESIGNAL NATIVE TEST ═══ */
+setTimeout(async () => {
+  if (window.OneSignal) {
+    try {
+      const isSubscribed = await OneSignal.User.PushSubscription.optedIn;
+      alert("OneSignal Connected: " + isSubscribed);
+    } catch(e) {
+      alert("OneSignal Error: " + e.message);
+    }
+  } else {
+    alert("OneSignal load nahi hua APK me!");
+  }
+}, 5000);
   
 </script>  
 
