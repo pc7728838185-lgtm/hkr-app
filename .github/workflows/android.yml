@@ -53,7 +53,7 @@ jobs:
       - name: Copy Firebase File
         run: cp google-services.json android/app/google-services.json
 
-      # 👇 YAHAN SYNC ME PLUGIN ADD KIYA HAI 👇
+      
       - name: Sync Android
         run: npx cap sync android
 
