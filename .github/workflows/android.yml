@@ -31,6 +31,7 @@ jobs:
           npm install
           npm install @capacitor/core @capacitor/cli @capacitor/android
           npm install @onesignal/capacitor-plugin
+          npm install --save-dev @capacitor/assets
       - name: Prepare web files
         run: |
           mkdir -p www
@@ -45,6 +46,9 @@ jobs:
 
       - name: Add Android platform
         run: npx cap add android
+
+      - name: Generate Android App Icon
+        run: npx capacitor-assets generate --android
 
       - name: Add Notification Permission
         run: |
